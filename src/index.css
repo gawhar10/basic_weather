@@ -27,7 +27,7 @@ body {
 main {
     max-width: 400px;
     margin-inline: auto;
-    margin-block-start: 1rem;
+    margin-block: 1rem;
     /* padding: 1rem; */
     display: grid;
     gap: 1rem;
