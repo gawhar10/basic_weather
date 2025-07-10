@@ -242,6 +242,7 @@ const App = () => {
           <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
         </div>
       </section>
+      <footer>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
     </main>
   )
 }

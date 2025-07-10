@@ -50,10 +50,16 @@ header>div {
     /* border: 1px solid teal; */
 }
 
+header>div>h1 {
+    font-weight: 600;
+    color: var(--forest-green);
+}
+
 header>div>img {
     display: block;
     max-width: 15%;
     height: auto;
+
 }
 
 header>button {
@@ -110,7 +116,7 @@ form>input {
     padding: 1rem;
     font-weight: 600;
     font-size: 1.4rem;
-    border: 1px solid var(--forest-green);
+    border: 1px solid var(--teal-blue);
     color: var(--forest-green);
     border-radius: var(--border-radius);
 }
@@ -219,4 +225,13 @@ form>button {
 
 .AQI_container>div>p {
     color: var(--forest-green);
+}
+
+footer {
+    font-size: 1.1rem;
+    font-weight: 600;
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
 }
