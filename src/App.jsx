@@ -52,17 +52,21 @@ const App = () => {
   };
 
   const getAQIFn = async (latitude, longitude, ISOTime) => {
-    // get AQI.
-    const AQIUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&hourly=pm10,pm2_5`;
-    // console.log(AQIUrl);
-    const response = await fetch(AQIUrl);
-    const AQIData = await response.json();
-    const newTime = makeRoundISOTimeFn(ISOTime);
-    const index = AQIData.hourly.time.indexOf(newTime);
-    const pm10 = AQIData.hourly.pm10[index];
-    const pm2_5 = AQIData.hourly.pm2_5[index];
-    setPM10Current(pm10);
-    setPM2_5Current(pm2_5);
+    try {
+      // get AQI.
+      const AQIUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&hourly=pm10,pm2_5`;
+      // console.log(AQIUrl);
+      const response = await fetch(AQIUrl);
+      const AQIData = await response.json();
+      const newTime = makeRoundISOTimeFn(ISOTime);
+      const index = AQIData.hourly.time.indexOf(newTime);
+      const pm10 = AQIData.hourly.pm10[index];
+      const pm2_5 = AQIData.hourly.pm2_5[index];
+      setPM10Current(pm10);
+      setPM2_5Current(pm2_5);
+    } catch (error) {
+      console.log('error:', error);
+    }
   };
 
   const WMOWeatherCodeFn = (weatherCode) => {
@@ -105,25 +109,30 @@ const App = () => {
   };
 
   const getWeatherFn = async (latitude, longitude) => {
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
-    const response = await fetch(weatherUrl);
-    // console.log(weatherUrl);
-    const responseJson = await response.json();
-    setWeatherData(responseJson);
-    const weatherCode = responseJson.current.weather_code;
-    const weatherCodeMeaning = WMOWeatherCodeFn(weatherCode);
-    setWmoWeather(weatherCodeMeaning);
-    // console.log(wmoWeather, weatherCodeMeaning);
-    const ISOTime = responseJson.current.time;
-    const regularTime = makeRegularTimeFn(ISOTime);
-    setRefreshTime(regularTime);
-    getAQIFn(latitude, longitude, ISOTime);
+    try {
+
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
+      const response = await fetch(weatherUrl);
+      // console.log(weatherUrl);
+      const responseJson = await response.json();
+      setWeatherData(responseJson);
+      const weatherCode = responseJson.current.weather_code;
+      const weatherCodeMeaning = WMOWeatherCodeFn(weatherCode);
+      setWmoWeather(weatherCodeMeaning);
+      // console.log(wmoWeather, weatherCodeMeaning);
+      const ISOTime = responseJson.current.time;
+      const regularTime = makeRegularTimeFn(ISOTime);
+      setRefreshTime(regularTime);
+      getAQIFn(latitude, longitude, ISOTime);
+    } catch (error) {
+      console.log('error: ', error);
+    }
   };
 
   const citySelectHandler = (latitude, longitude, city) => {
     setMenuShow(false);
     setCurrentCity(city);
-    console.log(`latitude: ${latitude}, longitude: ${longitude}`);
+    // console.log(`latitude: ${latitude}, longitude: ${longitude}`);
     const cityInfo = [latitude, longitude, city];
     localStorage.setItem('cityInfo', JSON.stringify(cityInfo));
     getWeatherFn(latitude, longitude);
@@ -181,7 +190,6 @@ const App = () => {
       </header>
       <section>
         <form onSubmit={handleSubmit}>
-          {/*<label htmlFor="cityName"></label>*/}
           <input type="text" id="cityName" value={cityName} onChange={(e) => setCityName(e.target.value)} />
           <button type="submit">Search </button>
         </form>
