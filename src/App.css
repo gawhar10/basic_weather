@@ -1,18 +1,20 @@
 main {
-  max-width: 400px;
+  max-width: 500px;
   margin-inline: auto;
   /* margin-block: 1rem; */
-  padding: 1rem;
+  padding: 2rem;
   display: grid;
   gap: 1rem;
-  /* border: 1px solid teal; */
+  border: 1px solid teal;
 }
 
 header {
+  max-width: 100%;
   display: grid;
-  grid-template-columns: 90% 10%;
+  grid-template-columns: .9fr .1fr;
   background-color: var(--white);
   padding: 1rem;
+  gap: 1rem;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
 }
@@ -21,12 +23,13 @@ header>div {
   display: flex;
   align-items: center;
   gap: 1rem;
-  /* border: 1px solid teal; */
+  border: 1px solid teal;
 }
 
 header>div>h2 {
   font-weight: 600;
-  /* color: var(--forest-green); */
+  font-size: 1.6rem;
+  /* border: 1px solid teal; */
 }
 
 header>div>img {
@@ -39,6 +42,7 @@ header>div>img {
 header>button {
   border-style: none;
   background-color: unset;
+  border: 1px solid teal;
 }
 
 header>button>img {
@@ -64,7 +68,7 @@ header>button>img:hover {
 }
 
 .city_menu_container>ul>li {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 600;
   padding: 2rem;
   border-top: 1px solid var(--forest-green);
@@ -78,9 +82,12 @@ header>button>img:hover {
 }
 
 form {
+  max-width: 100%;
   padding: 2rem;
-  display: flex;
+  display: grid;
+  grid-template-columns: .7fr .3fr;
   justify-content: space-between;
+  gap: 1rem;
   background-color: var(--white);
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
@@ -89,7 +96,7 @@ form {
 form>input {
   padding: 1rem;
   font-weight: 600;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   border: 1px solid var(--teal-blue);
   /* color: var(--forest-green); */
   font-family: var(--font-family);
@@ -102,13 +109,14 @@ form>button {
   box-shadow: var(--box-shadow);
   color: var(--white);
   font-family: var(--font-family);
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 600;
   padding-inline: 3rem;
   border-radius: var(--border-radius);
 }
 
 .icon_temp_container {
+  max-width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -116,23 +124,25 @@ form>button {
   background-color: var(--white);
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
+  /* border: 1px solid teal; */
 }
 
 .icon_temp_container>h1 {
   font-size: 8rem;
   font-weight: 500;
   /* color: var(--forest-green); */
-  /* border: 1px solid teal; */
+  border: 1px solid teal;
 }
 
 .icon_temp_container>img {
   display: block;
-  width: 30%;
+  max-width: 30%;
   height: auto;
-  /* border: 1px solid teal; */
+  border: 1px solid teal;
 }
 
 .weather_type_container {
+  max-width: 100%;
   text-align: center;
   padding: 2rem;
   background-color: var(--white);
@@ -140,22 +150,19 @@ form>button {
   border-radius: var(--border-radius);
 }
 
-.weather_type_container>p {
-  /* color: var(--forest-green); */
-}
-
 .weather_type_container>p:nth-child(1) {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 600;
   margin-block-end: 1rem;
 }
 
 .weather_type_container>p:nth-child(2) {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 400;
 }
 
 .city_name_container {
+  max-width: 100%;
   text-align: center;
   padding: 2rem;
   background-color: var(--white);
@@ -165,11 +172,12 @@ form>button {
 
 .city_name_container>p {
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: 600;
   /* color: var(--forest-green); */
 }
 
 .weather_details_container {
+  max-width: 100%;
   display: flex;
   justify-content: space-between;
 }
@@ -182,7 +190,7 @@ form>button {
 }
 
 .weather_details_container>div>p {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   /* font-weight: 600; */
   /* color: var(--forest-green); */
 }
@@ -192,7 +200,7 @@ form>button {
   margin-block-end: 1rem;
   justify-content: space-between;
   padding: 2rem;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   /* font-weight: 400; */
   background-color: var(--white);
   box-shadow: var(--box-shadow);
@@ -200,6 +208,7 @@ form>button {
 }
 
 footer {
+  max-width: 100%;
   font-size: 1.1rem;
   font-weight: 600;
   background-color: var(--white);
