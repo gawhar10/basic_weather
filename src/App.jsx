@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import './App.css';
 const App = () => {
   const [weatherData, setWeatherData] = useState(false);
   const [currentCity, setCurrentCity] = useState("");
@@ -8,21 +8,17 @@ const App = () => {
   const [PM10Current, setPM10Current] = useState("");
   const [PM2_5Current, setPM2_5Current] = useState("");
 
-  // functions for form field
+  // States for form field.
   const [cityName, setCityName] = useState("");
   const [cityList, setCityList] = useState([]);
   const [menuShow, setMenuShow] = useState(false);
 
   const getLocationsFn = async (cityName) => {
     try {
-      const locationUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=3&language=en&format=json`;
-      const response = await fetch(locationUrl);
-      const responseJson = await response.json();
-      // always send mapped data in return from an API.
-      const locations = responseJson.results.map((location) => {
-        return location;
-      });
-      return locations;
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=3&language=en&format=json`;
+      let response = await fetch(url);
+      response = await response.json();
+      setCityList(() => response['results']);
     } catch (error) {
       console.error('error', error);
     }
@@ -32,38 +28,31 @@ const App = () => {
     // making round hour ISOTime. ie 09:00, 10:00 instead
     // of 09:30, 09:45.
     const time = ISOTime.split(':');
-    if (time[1] !== 0) {
-      time.pop();
-      time.push("00");
-    }
-    const newTime = time.join(":");
-    return newTime;
+    if (time[1] === 0) return time.join(':');
+    time.pop();
+    time.push("00");
+    return time.join(":");
   };
 
   const makeRegularTimeFn = (ISOTime) => {
-    const date = new Date(ISOTime);
-    const commonDate = date.toDateString().split(' ');
-    commonDate.pop();
-    const commonTime = date.toLocaleTimeString();
-    const temp1 = commonTime.split(':');
-    const temp2 = commonTime.split(' ');
-    const CommonTime = `${temp1[0]}:${temp1[1]} ${temp2[1].toUpperCase()}`;
-    return `${commonDate.join(' ')}, ${CommonTime}`;
+    const newDate = new Date(ISOTime);
+    const date = newDate.toDateString().split(' ');
+    date.pop();
+    const time = newDate.toLocaleTimeString().split(':');
+    const amPm = time[2].split(' ')[1].toUpperCase();
+    time.pop();
+    return `${date.join(' ')}, ${time.join(':')}${amPm}`;
   };
 
   const getAQIFn = async (latitude, longitude, ISOTime) => {
     try {
-      // get AQI.
-      const AQIUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&hourly=pm10,pm2_5`;
-      // console.log(AQIUrl);
-      const response = await fetch(AQIUrl);
-      const AQIData = await response.json();
-      const newTime = makeRoundISOTimeFn(ISOTime);
-      const index = AQIData.hourly.time.indexOf(newTime);
-      const pm10 = AQIData.hourly.pm10[index];
-      const pm2_5 = AQIData.hourly.pm2_5[index];
-      setPM10Current(pm10);
-      setPM2_5Current(pm2_5);
+      const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&hourly=pm10,pm2_5`;
+      let response = await fetch(url);
+      response = await response.json();
+      const roundTime = makeRoundISOTimeFn(ISOTime);
+      const index = response.hourly.time.indexOf(roundTime);
+      setPM10Current(() => response.hourly.pm10[index]);
+      setPM2_5Current(() => response.hourly.pm2_5[index]);
     } catch (error) {
       console.log('error:', error);
     }
@@ -110,20 +99,14 @@ const App = () => {
 
   const getWeatherFn = async (latitude, longitude) => {
     try {
-
       const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
-      const response = await fetch(weatherUrl);
-      // console.log(weatherUrl);
-      const responseJson = await response.json();
-      setWeatherData(responseJson);
-      const weatherCode = responseJson.current.weather_code;
-      const weatherCodeMeaning = WMOWeatherCodeFn(weatherCode);
-      setWmoWeather(weatherCodeMeaning);
-      // console.log(wmoWeather, weatherCodeMeaning);
-      const ISOTime = responseJson.current.time;
-      const regularTime = makeRegularTimeFn(ISOTime);
-      setRefreshTime(regularTime);
-      getAQIFn(latitude, longitude, ISOTime);
+      let response = await fetch(weatherUrl);
+      response = await response.json();
+      setWeatherData({ ...response });
+      setWmoWeather(() => WMOWeatherCodeFn(response.current.weather_code));
+      setRefreshTime(() => makeRegularTimeFn(response.current.time));
+      getAQIFn(latitude, longitude, response.current.time);
+      // console.log(response.current.time);
     } catch (error) {
       console.log('error: ', error);
     }
@@ -143,8 +126,7 @@ const App = () => {
     if (cityName) {
       // if the function is using async await then its 
       // variable should also use async and await.
-      const locations = await getLocationsFn(cityName);
-      setCityList(locations);
+      await getLocationsFn(cityName);
       setMenuShow(true);
     }
   };
@@ -159,22 +141,22 @@ const App = () => {
   }, []);
 
   const refeshPageFn = () => {
-    let lastUpdated = refreshTime.split(' ');
-    lastUpdated = lastUpdated[3].split(':');
-    const date = new Date();
-    const minutes = date.getMinutes();
-    const hours = date.getHours();
-    // check if city and its location is there in localhost.
-    if (JSON.parse(localStorage.getItem('cityInfo'))) {
+    if (refreshTime) {
+      let lastUpdated = refreshTime.split(' ');
+      lastUpdated = lastUpdated[3].split(':');
+      const date = new Date();
+      const minutes = date.getMinutes();
+      const hours = date.getHours();
       const cityInfo = JSON.parse(localStorage.getItem('cityInfo'));
       if (Number(lastUpdated[1]) + 20 < minutes || Number(lastUpdated[0]) + 1 === hours) {
         setCurrentCity(cityInfo[2]);
         getWeatherFn(cityInfo[0], cityInfo[1]);
         console.log('page refreshed!');
+      } else {
+        console.log(`Page not refreshed, It's already updated!`);
       }
-      else {
-        console.log('Page not refreshed!');
-      }
+    } else {
+      console.log(`Page not refreshed!`);
     }
   };
 
@@ -184,7 +166,7 @@ const App = () => {
       <header>
         <div>
           <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
-          <h1>Only Weather</h1>
+          <h2>Only Weather</h2>
         </div>
         <button onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
       </header>
@@ -220,8 +202,8 @@ const App = () => {
       </section>
       <section className="weather_details_container">
         <div>
-          <p>H:{weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
-          <p>L:{weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
+          <p>High: {weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
+          <p>Low: {weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
         </div>
         <div>
           <p>Humidity</p>
