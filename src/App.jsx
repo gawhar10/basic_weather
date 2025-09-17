@@ -163,7 +163,7 @@ const App = () => {
 
   return (
     <main>
-      <header>
+      <header className='glass_card'>
         <div>
           <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
           <h2>Only Weather</h2>
@@ -171,12 +171,12 @@ const App = () => {
         <button onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
       </header>
       <section>
-        <form onSubmit={handleSubmit}>
+        <form className='glass_card' onSubmit={handleSubmit}>
           <input type="text" id="cityName" value={cityName} onChange={(e) => setCityName(e.target.value)} />
           <button type="submit">Search </button>
         </form>
         {menuShow ? (
-          <div className="city_menu_container">
+          <div className="city_menu_container glass_card">
             <ul>
               {cityList.map((city) => {
                 const { admin1, country, id, latitude, longitude, name, } = city;
@@ -188,43 +188,43 @@ const App = () => {
           </div>) : (<p></p>)
         }
       </section>
-      <section className="icon_temp_container">
+      <section className="icon_temp_container glass_card">
         <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="icon"></img>
         <h1>{weatherData ? (weatherData.current.temperature_2m) : 'na'}&deg;</h1>
 
       </section>
-      <section className="weather_type_container">
+      <section className="weather_type_container glass_card">
         <p>{wmoWeather ? wmoWeather : 'na'}</p>
         <p> {weatherData ? (refreshTime) : 'na'} </p>
       </section>
-      <section className="city_name_container">
+      <section className="city_name_container glass_card">
         <p>{currentCity}</p>
       </section>
       <section className="weather_details_container">
-        <div>
+        <div className='glass_card'>
           <p>High: {weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
           <p>Low: {weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
         </div>
-        <div>
+        <div className='glass_card'>
           <p>Humidity</p>
           <p>{weatherData ? (weatherData.current.relative_humidity_2m) : 'na'}%</p>
         </div>
-        <div>
+        <div className='glass_card'>
           <p>Wind</p>
           <p>{weatherData ? (weatherData.current.wind_speed_10m) : 'na'}km/h</p>
         </div>
       </section>
       <section className='AQI_container'>
-        <div>
+        <div className='glass_card'>
           <p>PM10</p>
           <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
         </div>
-        <div>
+        <div className='glass_card'>
           <p>PM2.5</p>
           <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
         </div>
       </section>
-      <footer>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
+      <footer className='glass_card'>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
     </main>
   )
 }

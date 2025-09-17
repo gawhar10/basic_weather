@@ -17,9 +17,17 @@ html {
     --white: rgb(255, 255, 255);
     --box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
     --border-radius: 0.4rem;
+    --mint-tint: rgba(0, 199, 190, 0.2);
+    --mint-tint-hover: rgba(0, 199, 190, 0.35);
 }
 
 body {
     font-family: var(--font-family);
-    background-color: var(--teal-blue);
+    margin: 0;
+    height: 100vh;
+    background-image: url('https://images.unsplash.com/photo-1694950301466-a941e81d0d1c?q=100&w=1074');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
