@@ -13,6 +13,8 @@ const App = () => {
   const [cityList, setCityList] = useState([]);
   const [menuShow, setMenuShow] = useState(false);
 
+  const wallpapersId = ['1746023790801-a10185075896', '1746023790104-df44921a7a88', '1758805769600-322d4f615981', '1759778276353-96f734f8df9b', '1543187018-21e461e7538e', '1476673160081-cf065607f449', '1542875272-2037d53b5e4d', '1542708993627-b6e5bbae43c4', '1542822223-606661cf0a48', '1543227043-f69c82e95af9', '1542690970-7310221dbe09'];
+
   const getLocationsFn = async (cityName) => {
     try {
       const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=3&language=en&format=json`;
@@ -99,14 +101,15 @@ const App = () => {
 
   const getWeatherFn = async (latitude, longitude) => {
     try {
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
+      // const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,rain_sum&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,apparent_temperature,rain&timezone=auto`;
       let response = await fetch(weatherUrl);
       response = await response.json();
       setWeatherData({ ...response });
       setWmoWeather(() => WMOWeatherCodeFn(response.current.weather_code));
       setRefreshTime(() => makeRegularTimeFn(response.current.time));
       getAQIFn(latitude, longitude, response.current.time);
-      // console.log(response.current.time);
+      // console.log(response);
     } catch (error) {
       console.log('error: ', error);
     }
@@ -140,18 +143,25 @@ const App = () => {
     }
   }, []);
 
-  const refeshPageFn = () => {
+  const refeshPageFn = async () => {
     if (refreshTime) {
-      let lastUpdated = refreshTime.split(' ');
-      lastUpdated = lastUpdated[3].split(':');
+      const lastUpdated = refreshTime.split(' ')[3].split(':');
+      let lastRefreshedMinutes = lastUpdated[1].split('');
+      lastRefreshedMinutes = lastRefreshedMinutes[0] + lastRefreshedMinutes[1];
+      // console.log(refreshTime, lastUpdated, lastRefreshedMinutes);
       const date = new Date();
       const minutes = date.getMinutes();
       const hours = date.getHours();
       const cityInfo = JSON.parse(localStorage.getItem('cityInfo'));
-      if (Number(lastUpdated[1]) + 20 < minutes || Number(lastUpdated[0]) + 1 === hours) {
-        setCurrentCity(cityInfo[2]);
-        getWeatherFn(cityInfo[0], cityInfo[1]);
+      if (Number(lastRefreshedMinutes) + 15 < minutes || Number(lastUpdated[0]) + 1 === hours) {
+        const currentData = await getWeatherFn(cityInfo[0], cityInfo[1]);
         console.log('page refreshed!');
+        // Random unsplash wallpaper with every refresh.
+        const randomIndex = Math.floor(Math.random() * wallpapersId.length);
+        document.body.style.backgroundImage = `url(https://images.unsplash.com/photo-${wallpapersId[randomIndex]}?q=100&w=1280)`;
+        // document.body.style.backgroundSize = 'cover';
+        // document.body.style.backgroundPosition = 'center';
+        document.body.style.transition = 'background-image 0.5s ease-in-out';
       } else {
         console.log(`Page not refreshed, It's already updated!`);
       }
@@ -213,16 +223,45 @@ const App = () => {
           <p>Wind</p>
           <p>{weatherData ? (weatherData.current.wind_speed_10m) : 'na'}km/h</p>
         </div>
+        <div className='glass_card'>
+          <div>
+            <p>PM2.5</p>
+            <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
+          </div>
+          <div>
+            <p>PM10</p>
+            <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
+          </div>
+        </div>
       </section>
-      <section className='AQI_container'>
+      <section className='sevenDay_container'>
         <div className='glass_card'>
-          <p>PM10</p>
-          <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
+          <p>Seven day Weather</p>
         </div>
         <div className='glass_card'>
-          <p>PM2.5</p>
-          <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
+          <p>Day</p>
+          <p>Min&deg;</p>
+          <p>Max&deg;</p>
+          <p>Rain mm</p>
         </div>
+        <ul>
+          {
+            weatherData ? (
+              weatherData.daily.time.map((item, index) => {
+                const date = new Date(weatherData.daily.time[index]);
+                return (
+                  <li className='glass_card' key={index}>
+                    <p>{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
+                    <p>{weatherData.daily.temperature_2m_min[index]}&deg;</p>
+                    <p>{weatherData.daily.temperature_2m_max[index]}&deg;</p>
+                    <p>{weatherData.daily.rain_sum[index]}</p>
+                  </li>
+                )
+              })
+            ) : <p></p>
+
+          }
+        </ul>
       </section>
       <footer className='glass_card'>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
     </main>
