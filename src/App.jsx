@@ -236,7 +236,7 @@ const App = () => {
       </section>
       <section className='sevenDay_container'>
         <div className='glass_card'>
-          <p>Seven day Weather</p>
+          <p>Seven days Weather</p>
         </div>
         <div className='glass_card'>
           <p>Day</p>
