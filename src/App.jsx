@@ -13,7 +13,47 @@ const App = () => {
   const [cityList, setCityList] = useState([]);
   const [menuShow, setMenuShow] = useState(false);
 
-  const wallpapersId = ['1746023790801-a10185075896', '1746023790104-df44921a7a88', '1758805769600-322d4f615981', '1759778276353-96f734f8df9b', '1543187018-21e461e7538e', '1476673160081-cf065607f449', '1542875272-2037d53b5e4d', '1542708993627-b6e5bbae43c4', '1542822223-606661cf0a48', '1543227043-f69c82e95af9', '1542690970-7310221dbe09'];
+  const [settingShow, setSettingShow] = useState(false);
+
+  const [themeColors, setThemeColors] = useState(
+    {
+      'background': '#F5F5F5',
+      'foreground': '#212121'
+    });
+
+  const colorPairs = {
+    'blue': {
+      'background': '#ECEFF1',
+      'foreground': '#263238'
+    },
+    'green': {
+      'background': '#C8E6C9',
+      'foreground': '#1B5E20'
+    },
+    'dakGreen': {
+      'background': '#ffffff',
+      'foreground': '#41682c'
+    },
+    'purple': {
+      'background': '#ffffff',
+      'foreground': '#65558f'
+    },
+    'dullGreen': {
+      'background': '#ffffff',
+      'foreground': '#60620b'
+    }
+  };
+
+  useEffect(() => {
+    document.body.style.backgroundColor = themeColors.background;
+  }, [themeColors]);
+
+  const mainStyle = {
+    backgroundColor: themeColors.foreground,
+    color: '#FFFFFF'
+  };
+
+  // const wallpapersId = ['1746023790801-a10185075896', '1746023790104-df44921a7a88', '1758805769600-322d4f615981', '1759778276353-96f734f8df9b', '1543187018-21e461e7538e', '1476673160081-cf065607f449', '1542875272-2037d53b5e4d', '1542708993627-b6e5bbae43c4', '1542822223-606661cf0a48', '1543227043-f69c82e95af9', '1542690970-7310221dbe09'];
 
   const getLocationsFn = async (cityName) => {
     try {
@@ -156,12 +196,6 @@ const App = () => {
       if (Number(lastRefreshedMinutes) + 15 < minutes || Number(lastUpdated[0]) + 1 === hours) {
         const currentData = await getWeatherFn(cityInfo[0], cityInfo[1]);
         console.log('page refreshed!');
-        // Random unsplash wallpaper with every refresh.
-        const randomIndex = Math.floor(Math.random() * wallpapersId.length);
-        document.body.style.backgroundImage = `url(https://images.unsplash.com/photo-${wallpapersId[randomIndex]}?q=100&w=1280)`;
-        // document.body.style.backgroundSize = 'cover';
-        // document.body.style.backgroundPosition = 'center';
-        document.body.style.transition = 'background-image 0.5s ease-in-out';
       } else {
         console.log(`Page not refreshed, It's already updated!`);
       }
@@ -170,75 +204,93 @@ const App = () => {
     }
   };
 
+  const settingMenuFn = () => {
+    setSettingShow(!settingShow);
+  };
 
   return (
-    <main>
-      <header className='glass_card'>
-        <div>
-          <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
-          <h2>Only Weather</h2>
-        </div>
+    <main style={mainStyle}>
+      <header>
+        <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
+        <h2>Only Weather</h2>
+        <button onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
         <button onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
       </header>
-      <section>
-        <form className='glass_card' onSubmit={handleSubmit}>
-          <input type="text" id="cityName" value={cityName} onChange={(e) => setCityName(e.target.value)} />
-          <button type="submit">Search </button>
-        </form>
-        {menuShow ? (
-          <div className="city_menu_container glass_card">
-            <ul>
-              {cityList.map((city) => {
-                const { admin1, country, id, latitude, longitude, name, } = city;
-                return (
-                  <li key={id}><a onClick={() => citySelectHandler(latitude, longitude, name)}>{name}, {admin1}, {country}</a></li>
-                );
-              })}
-            </ul>
-          </div>) : (<p></p>)
-        }
-      </section>
-      <section className="icon_temp_container glass_card">
-        <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="icon"></img>
-        <h1>{weatherData ? (weatherData.current.temperature_2m) : 'na'}&deg;</h1>
-
-      </section>
-      <section className="weather_type_container glass_card">
-        <p>{wmoWeather ? wmoWeather : 'na'}</p>
-        <p> {weatherData ? (refreshTime) : 'na'} </p>
-      </section>
-      <section className="city_name_container glass_card">
+      {
+        settingShow ? (
+          <section className='settings_container'>
+            <section className='form_section'>
+              <form onSubmit={handleSubmit}>
+                <input type="text" id="cityName" value={cityName} onChange={(e) => setCityName(e.target.value)} />
+                <button type="submit">Search </button>
+              </form>
+              {menuShow ? (
+                <div className="city_menu_container">
+                  <ul>
+                    {cityList.map((city) => {
+                      const { admin1, country, id, latitude, longitude, name, } = city;
+                      return (
+                        <li key={id}><a onClick={() => citySelectHandler(latitude, longitude, name)}>{name}, {admin1}, {country}</a></li>
+                      );
+                    })}
+                  </ul>
+                </div>) : (<p></p>)
+              }
+            </section>
+            <section className='color_section'>
+              <ul>{
+                Object.entries(colorPairs).map(([key, value]) => {
+                  return <li onClick={() => setThemeColors(value)} key={key} style={{ backgroundColor: value.foreground }} ></li>
+                })}
+              </ul>
+            </section>
+          </section>
+        ) : (<></>)
+      }
+      <section className="city_name_section">
         <p>{currentCity}</p>
       </section>
-      <section className="weather_details_container">
-        <div className='glass_card'>
-          <p>High: {weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
-          <p>Low: {weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
+      <section className="icon_temp_section">
+        <div>
+          <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="icon"></img>
+          <p className='weather_code'>{wmoWeather ? wmoWeather : 'na'}</p>
         </div>
-        <div className='glass_card'>
+        <div>
+          <p className='temp'>{weatherData ? (weatherData.current.temperature_2m) : 'na'}&deg;</p>
+          <p className='feels_like'>Feels Like: {weatherData ? (weatherData.current.apparent_temperature) : 'na'}&deg;</p>
+          <p className='refresh_time'>{weatherData ? (refreshTime) : 'na'}</p>
+        </div>
+      </section>
+
+      <section className="weather_details_container">
+        <div className=''>
+          <p>Max {weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
+          <p>Min: {weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
+        </div>
+        <div className=''>
           <p>Humidity</p>
           <p>{weatherData ? (weatherData.current.relative_humidity_2m) : 'na'}%</p>
         </div>
-        <div className='glass_card'>
+        <div className=''>
           <p>Wind</p>
           <p>{weatherData ? (weatherData.current.wind_speed_10m) : 'na'}km/h</p>
         </div>
-        <div className='glass_card'>
-          <div>
-            <p>PM2.5</p>
-            <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
-          </div>
-          <div>
-            <p>PM10</p>
-            <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
-          </div>
+      </section>
+      <section className='PM_section'>
+        <div>
+          <p>PM2.5</p>
+          <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
+        </div>
+        <div>
+          <p>PM10</p>
+          <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
         </div>
       </section>
       <section className='sevenDay_container'>
-        <div className='glass_card'>
+        <div className=''>
           <p>Seven days Weather</p>
         </div>
-        <div className='glass_card'>
+        <div className=''>
           <p>Day</p>
           <p>Min&deg;</p>
           <p>Max&deg;</p>
@@ -250,7 +302,7 @@ const App = () => {
               weatherData.daily.time.map((item, index) => {
                 const date = new Date(weatherData.daily.time[index]);
                 return (
-                  <li className='glass_card' key={index}>
+                  <li className='' key={index}>
                     <p>{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
                     <p>{weatherData.daily.temperature_2m_min[index]}&deg;</p>
                     <p>{weatherData.daily.temperature_2m_max[index]}&deg;</p>
@@ -259,11 +311,10 @@ const App = () => {
                 )
               })
             ) : <p></p>
-
           }
         </ul>
       </section>
-      <footer className='glass_card'>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
+      <footer className=''>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
     </main>
   )
 }

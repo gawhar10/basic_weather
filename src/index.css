@@ -9,7 +9,7 @@ html {
 }
 
 :root {
-    --font-family: "Inter", sans-serif;
+    --font-family: "Oswald", sans-serif;
     --baby-blue: rgb(231, 246, 252);
     --teal-green: rgb(2, 132, 118);
     --forest-green: rgb(0, 34, 28);
@@ -19,16 +19,11 @@ html {
     --border-radius: 0.4rem;
     --mint-tint: rgba(0, 199, 190, 0.2);
     --mint-tint-hover: rgba(0, 199, 190, 0.35);
-    --font-size: 1.4rem;
+    --font-size: 1.6rem;
 }
 
 body {
     font-family: var(--font-family);
     margin: 0;
     height: 100vh;
-    background-image: url('https://images.unsplash.com/photo-1694950301466-a941e81d0d1c?q=100&w=1074');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
 }
