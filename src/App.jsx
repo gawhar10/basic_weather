@@ -15,6 +15,8 @@ const App = () => {
 
   const [settingShow, setSettingShow] = useState(false);
 
+  const [unitName, setUnitName] = useState('celcius');
+
   const [themeColors, setThemeColors] = useState(
     {
       'background': '#bbebec',
@@ -31,15 +33,15 @@ const App = () => {
       'foreground': '#1B5E20'
     },
     'dakGreen': {
-      'background': '#ffffff',
+      'background': '#d9e7cb',
       'foreground': '#41682c'
     },
     'purple': {
-      'background': '#ffffff',
+      'background': '#f8f1f6',
       'foreground': '#65558f'
     },
     'dullGreen': {
-      'background': '#ffffff',
+      'background': '#d9e7cb',
       'foreground': '#60620b'
     },
     'red': {
@@ -50,11 +52,15 @@ const App = () => {
 
   useEffect(() => {
     document.body.style.backgroundColor = themeColors.background;
-  }, [themeColors]);
+  }, [themeColors, unitName]);
 
   const mainStyle = {
     backgroundColor: themeColors.foreground,
     color: '#FFFFFF'
+  };
+
+  const linkActiveStyle = {
+    backgroundColor: '#555555'
   };
 
   // const wallpapersId = ['1746023790801-a10185075896', '1746023790104-df44921a7a88', '1758805769600-322d4f615981', '1759778276353-96f734f8df9b', '1543187018-21e461e7538e', '1476673160081-cf065607f449', '1542875272-2037d53b5e4d', '1542708993627-b6e5bbae43c4', '1542822223-606661cf0a48', '1543227043-f69c82e95af9', '1542690970-7310221dbe09'];
@@ -185,6 +191,9 @@ const App = () => {
       setCurrentCity(cityInfo[2]);
       getWeatherFn(cityInfo[0], cityInfo[1]);
     }
+    if (JSON.parse(localStorage.getItem('selectedTheme'))) {
+      setThemeColors(JSON.parse(localStorage.getItem('selectedTheme')));
+    }
   }, []);
 
   const refeshPageFn = async () => {
@@ -210,6 +219,11 @@ const App = () => {
 
   const settingMenuFn = () => {
     setSettingShow(!settingShow);
+  };
+
+  const themeFn = (theme) => {
+    setThemeColors(theme);
+    localStorage.setItem('selectedTheme', JSON.stringify(theme));
   };
 
   return (
@@ -245,9 +259,13 @@ const App = () => {
               <section className='color_section'>
                 <ul>{
                   Object.entries(colorPairs).map(([key, value]) => {
-                    return <li onClick={() => setThemeColors(value)} key={key} style={{ backgroundColor: value.foreground }} ></li>
+                    return <li onClick={() => themeFn(value)} key={key} style={{ backgroundColor: value.foreground }} ></li>
                   })}
                 </ul>
+              </section>
+              <section className='temp_unit_section'>
+                <button style={unitName === 'celcius' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => unitName !== 'celcius' && setUnitName('celcius')}>°C</button>
+                <button style={unitName === 'fahrenheit' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => unitName !== 'fahrenheit' && setUnitName('fahrenheit')}>°F</button>
               </section>
             </section>
           ) : (<></>)
@@ -261,7 +279,10 @@ const App = () => {
             <p className='weather_code'>{wmoWeather ? wmoWeather : 'na'}</p>
           </div>
           <div>
-            <p className='temp'>{weatherData ? (weatherData.current.temperature_2m) : 'na'}&deg;</p>
+            <p className='temp'>{weatherData && (
+              unitName === 'celcius' ? `${(weatherData.current.temperature_2m * 1).toFixed(1)}°C` :
+                unitName === 'fahrenheit' ? `${(weatherData.current.temperature_2m * 1.8 + 32).toFixed(1)}°F` : null)}
+            </p>
             <p className='feels_like'>Feels Like: {weatherData ? (weatherData.current.apparent_temperature) : 'na'}&deg;</p>
             <p className='refresh_time'>{weatherData ? (refreshTime) : 'na'}</p>
           </div>
@@ -269,8 +290,8 @@ const App = () => {
 
         <section className="weather_details_container">
           <div className=''>
-            <p>Max {weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
-            <p>Min: {weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
+            <p>Max {weatherData && (unitName === 'celcius' ? `${weatherData.daily.temperature_2m_max[0]}°C` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_max[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
+            <p>Min {weatherData && (unitName === 'celcius' ? `${weatherData.daily.temperature_2m_min[0]}°C` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_min[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
           </div>
           <div className=''>
             <p>Humidity</p>
@@ -300,8 +321,8 @@ const App = () => {
           </div>
           <div className=''>
             <p>Day</p>
-            <p>Min&deg;</p>
-            <p>Max&deg;</p>
+            <p>Min {unitName === 'celcius' ? `°C` : unitName === 'fahrenheit' ? `°F` : null} </p>
+            <p>Max {unitName === 'celcius' ? `°C` : unitName === 'fahrenheit' ? `°F` : null} </p>
             <p>Rain mm</p>
           </div>
           <ul>
@@ -312,8 +333,8 @@ const App = () => {
                   return (
                     <li className='' key={index}>
                       <p>{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
-                      <p>{weatherData.daily.temperature_2m_min[index]}&deg;</p>
-                      <p>{weatherData.daily.temperature_2m_max[index]}&deg;</p>
+                      <p>{unitName === 'celcius' ? `${weatherData.daily.temperature_2m_min[index]}°` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_min[index] * 1.8 + 32).toFixed(1)}°` : null}</p>
+                      <p>{unitName === 'celcius' ? `${weatherData.daily.temperature_2m_max[index]}°` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_max[index] * 1.8 + 32).toFixed(1)}°` : null}</p>
                       <p>{weatherData.daily.rain_sum[index]}</p>
                     </li>
                   )
@@ -322,7 +343,10 @@ const App = () => {
             }
           </ul>
         </section>
-        <footer className=''>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
+        <footer>
+          <p>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</p>
+          <p>&copy; Designed and Coded by <a href='https://github.com/gawhar10/' target='_blank' rel='noopener noreferrer'>Gawhar10.</a></p>
+        </footer>
       </section>
 
     </main>

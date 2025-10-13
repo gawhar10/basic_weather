@@ -4,7 +4,7 @@ main {
   margin-block: 5rem;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  border-radius: 1rem;
+  /* border-radius: .3rem; */
 }
 
 header {
@@ -93,8 +93,18 @@ form>button {
 .color_section ul li {
   list-style: none;
   border: 1px solid #b6b6b6;
-  width: 2rem;
-  height: 2rem;
+  width: 3rem;
+  height: 3rem;
+}
+
+.temp_unit_section button {
+  border-style: unset;
+  background-color: #333333;
+  color: white;
+  width: 6rem;
+  height: 3rem;
+  border: 2px solid black;
+  font-weight: 500;
 }
 
 .city_menu_container>ul {
@@ -116,7 +126,7 @@ form>button {
 .city_name_section {
   text-align: center;
   padding-inline: 2rem;
-  padding-block-start: 2rem;
+  padding-block-start: 1rem;
 }
 
 .city_name_section p {
@@ -227,24 +237,39 @@ form>button {
 }
 
 footer {
-  font-size: 1.3rem;
-  font-weight: 600;
-  padding: 1rem;
+  padding: 2rem;
+  /* border: 1px solid yellowgreen; */
+}
+
+footer p {
+  font-size: 1rem;
+  font-weight: 400;
   border-radius: var(--border-radius);
-  padding-inline: 2rem;
-  padding-block: 2rem;
+  /* opacity: .9; */
 }
 
 footer a {
   color: #ffffff;
 }
 
+footer p a:hover {
+  cursor: pointer;
+
+}
+
 @media(max-width:600px) {
   main {
     grid-template-columns: unset;
     grid-template-rows: repeat(auto, 1fr);
-    margin-inline: unset;
-    margin-block: unset;
-    margin: 1rem;
+    margin: 2rem;
+  }
+
+  .PM_section,
+  .sevenDay_container {
+    padding-block: 1rem;
+  }
+
+  .seven_day_weather_p {
+    padding-block-end: 1rem;
   }
 }
