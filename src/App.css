@@ -1,9 +1,10 @@
 main {
-  max-width: 340px;
+  max-width: 800px;
   margin-inline: auto;
-  margin-block: 1rem;
-  display: flex;
-  flex-direction: column;
+  margin-block: 5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-radius: 1rem;
 }
 
 header {
@@ -127,7 +128,7 @@ form>button {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
-  padding-block: 2rem;
+  padding-block: 1rem;
   margin-inline: 2rem;
   border-bottom: 1px solid gray;
 }
@@ -162,7 +163,7 @@ form>button {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding-block: 2rem;
+  padding-block: 1rem;
   margin-inline: 2rem;
   border-bottom: 1px solid gray;
 }
@@ -208,6 +209,11 @@ form>button {
   margin-block-end: 1rem;
 }
 
+.seven_day_weather_p {
+  border-bottom: 1px solid gray;
+  padding-block-end: 2rem;
+}
+
 .sevenDay_container div:nth-of-type(2) {
   margin-block-end: 1rem;
   display: grid;
@@ -226,9 +232,19 @@ footer {
   padding: 1rem;
   border-radius: var(--border-radius);
   padding-inline: 2rem;
-  padding-block-start: 2rem;
+  padding-block: 2rem;
 }
 
 footer a {
   color: #ffffff;
+}
+
+@media(max-width:600px) {
+  main {
+    grid-template-columns: unset;
+    grid-template-rows: repeat(auto, 1fr);
+    margin-inline: unset;
+    margin-block: unset;
+    margin: 1rem;
+  }
 }

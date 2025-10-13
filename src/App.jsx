@@ -17,8 +17,8 @@ const App = () => {
 
   const [themeColors, setThemeColors] = useState(
     {
-      'background': '#F5F5F5',
-      'foreground': '#212121'
+      'background': '#bbebec',
+      'foreground': '#418181'
     });
 
   const colorPairs = {
@@ -41,6 +41,10 @@ const App = () => {
     'dullGreen': {
       'background': '#ffffff',
       'foreground': '#60620b'
+    },
+    'red': {
+      'background': '#fef1f0',
+      'foreground': '#9c4146'
     }
   };
 
@@ -210,111 +214,117 @@ const App = () => {
 
   return (
     <main style={mainStyle}>
-      <header>
-        <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
-        <h2>Only Weather</h2>
-        <button onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
-        <button onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
-      </header>
-      {
-        settingShow ? (
-          <section className='settings_container'>
-            <section className='form_section'>
-              <form onSubmit={handleSubmit}>
-                <input type="text" id="cityName" value={cityName} onChange={(e) => setCityName(e.target.value)} />
-                <button type="submit">Search </button>
-              </form>
-              {menuShow ? (
-                <div className="city_menu_container">
-                  <ul>
-                    {cityList.map((city) => {
-                      const { admin1, country, id, latitude, longitude, name, } = city;
-                      return (
-                        <li key={id}><a onClick={() => citySelectHandler(latitude, longitude, name)}>{name}, {admin1}, {country}</a></li>
-                      );
-                    })}
-                  </ul>
-                </div>) : (<p></p>)
-              }
+      <section className='main_left_section'>
+        <header>
+          <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
+          <h2>Only Weather</h2>
+          <button onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
+          <button onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
+        </header>
+        {
+          settingShow ? (
+            <section className='settings_container'>
+              <section className='form_section'>
+                <form onSubmit={handleSubmit}>
+                  <input type="text" id="cityName" value={cityName} onChange={(e) => setCityName(e.target.value)} />
+                  <button type="submit">Search </button>
+                </form>
+                {menuShow ? (
+                  <div className="city_menu_container">
+                    <ul>
+                      {cityList.map((city) => {
+                        const { admin1, country, id, latitude, longitude, name, } = city;
+                        return (
+                          <li key={id}><a onClick={() => citySelectHandler(latitude, longitude, name)}>{name}, {admin1}, {country}</a></li>
+                        );
+                      })}
+                    </ul>
+                  </div>) : (<p></p>)
+                }
+              </section>
+              <section className='color_section'>
+                <ul>{
+                  Object.entries(colorPairs).map(([key, value]) => {
+                    return <li onClick={() => setThemeColors(value)} key={key} style={{ backgroundColor: value.foreground }} ></li>
+                  })}
+                </ul>
+              </section>
             </section>
-            <section className='color_section'>
-              <ul>{
-                Object.entries(colorPairs).map(([key, value]) => {
-                  return <li onClick={() => setThemeColors(value)} key={key} style={{ backgroundColor: value.foreground }} ></li>
-                })}
-              </ul>
-            </section>
-          </section>
-        ) : (<></>)
-      }
-      <section className="city_name_section">
-        <p>{currentCity}</p>
-      </section>
-      <section className="icon_temp_section">
-        <div>
-          <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="icon"></img>
-          <p className='weather_code'>{wmoWeather ? wmoWeather : 'na'}</p>
-        </div>
-        <div>
-          <p className='temp'>{weatherData ? (weatherData.current.temperature_2m) : 'na'}&deg;</p>
-          <p className='feels_like'>Feels Like: {weatherData ? (weatherData.current.apparent_temperature) : 'na'}&deg;</p>
-          <p className='refresh_time'>{weatherData ? (refreshTime) : 'na'}</p>
-        </div>
+          ) : (<></>)
+        }
+        <section className="city_name_section">
+          <p>{currentCity}</p>
+        </section>
+        <section className="icon_temp_section">
+          <div>
+            <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="icon"></img>
+            <p className='weather_code'>{wmoWeather ? wmoWeather : 'na'}</p>
+          </div>
+          <div>
+            <p className='temp'>{weatherData ? (weatherData.current.temperature_2m) : 'na'}&deg;</p>
+            <p className='feels_like'>Feels Like: {weatherData ? (weatherData.current.apparent_temperature) : 'na'}&deg;</p>
+            <p className='refresh_time'>{weatherData ? (refreshTime) : 'na'}</p>
+          </div>
+        </section>
+
+        <section className="weather_details_container">
+          <div className=''>
+            <p>Max {weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
+            <p>Min: {weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
+          </div>
+          <div className=''>
+            <p>Humidity</p>
+            <p>{weatherData ? (weatherData.current.relative_humidity_2m) : 'na'}%</p>
+          </div>
+          <div className=''>
+            <p>Wind</p>
+            <p>{weatherData ? (weatherData.current.wind_speed_10m) : 'na'}km/h</p>
+          </div>
+        </section>
+        <section className='PM_section'>
+          <div>
+            <p>PM2.5</p>
+            <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
+          </div>
+          <div>
+            <p>PM10</p>
+            <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
+          </div>
+        </section>
       </section>
 
-      <section className="weather_details_container">
-        <div className=''>
-          <p>Max {weatherData ? (weatherData.daily.temperature_2m_max[0]) : 'na'}&deg;</p>
-          <p>Min: {weatherData ? (weatherData.daily.temperature_2m_min[0]) : 'na'}&deg;</p>
-        </div>
-        <div className=''>
-          <p>Humidity</p>
-          <p>{weatherData ? (weatherData.current.relative_humidity_2m) : 'na'}%</p>
-        </div>
-        <div className=''>
-          <p>Wind</p>
-          <p>{weatherData ? (weatherData.current.wind_speed_10m) : 'na'}km/h</p>
-        </div>
+      <section className='main_right_section'>
+        <section className='sevenDay_container'>
+          <div className='seven_day_weather_p'>
+            <p>Seven days Weather</p>
+          </div>
+          <div className=''>
+            <p>Day</p>
+            <p>Min&deg;</p>
+            <p>Max&deg;</p>
+            <p>Rain mm</p>
+          </div>
+          <ul>
+            {
+              weatherData ? (
+                weatherData.daily.time.map((item, index) => {
+                  const date = new Date(weatherData.daily.time[index]);
+                  return (
+                    <li className='' key={index}>
+                      <p>{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
+                      <p>{weatherData.daily.temperature_2m_min[index]}&deg;</p>
+                      <p>{weatherData.daily.temperature_2m_max[index]}&deg;</p>
+                      <p>{weatherData.daily.rain_sum[index]}</p>
+                    </li>
+                  )
+                })
+              ) : <p></p>
+            }
+          </ul>
+        </section>
+        <footer className=''>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
       </section>
-      <section className='PM_section'>
-        <div>
-          <p>PM2.5</p>
-          <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
-        </div>
-        <div>
-          <p>PM10</p>
-          <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
-        </div>
-      </section>
-      <section className='sevenDay_container'>
-        <div className=''>
-          <p>Seven days Weather</p>
-        </div>
-        <div className=''>
-          <p>Day</p>
-          <p>Min&deg;</p>
-          <p>Max&deg;</p>
-          <p>Rain mm</p>
-        </div>
-        <ul>
-          {
-            weatherData ? (
-              weatherData.daily.time.map((item, index) => {
-                const date = new Date(weatherData.daily.time[index]);
-                return (
-                  <li className='' key={index}>
-                    <p>{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
-                    <p>{weatherData.daily.temperature_2m_min[index]}&deg;</p>
-                    <p>{weatherData.daily.temperature_2m_max[index]}&deg;</p>
-                    <p>{weatherData.daily.rain_sum[index]}</p>
-                  </li>
-                )
-              })
-            ) : <p></p>
-          }
-        </ul>
-      </section>
-      <footer className=''>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</footer>
+
     </main>
   )
 }
