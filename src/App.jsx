@@ -198,16 +198,27 @@ const App = () => {
 
   const refeshPageFn = async () => {
     if (refreshTime) {
-      const lastUpdated = refreshTime.split(' ')[3].split(':');
-      let lastRefreshedMinutes = lastUpdated[1].split('');
-      lastRefreshedMinutes = lastRefreshedMinutes[0] + lastRefreshedMinutes[1];
-      // console.log(refreshTime, lastUpdated, lastRefreshedMinutes);
+      // This is the output of refreshTime = 'Tue Oct 14, 7:00PM';
+      const refreshedAt = refreshTime.split(',');
+      const refreshedAtDayMonth = refreshedAt[0].split(' ');
+      const refreshedAtHoursMinutes = refreshedAt[1].split(':');
+      let refreshedAtMinutes = refreshedAtHoursMinutes[1].split('');
+      refreshedAtMinutes = refreshedAtMinutes[0] + refreshedAtMinutes[1];
+
+      // Current time for comparing last refreshed time.
       const date = new Date();
-      const minutes = date.getMinutes();
-      const hours = date.getHours();
+      const day = date.getDate();
+
+      // Format for date.toLocaleTimeString() will be '8:14:33 pm'.
+      const time = date.toLocaleTimeString().split(':');
+
+      // Format of date.toString() will be 'Tue Oct 14 2025'.
+      const month = date.toDateString().split(' ')[1];
+
       const cityInfo = JSON.parse(localStorage.getItem('cityInfo'));
-      if (Number(lastRefreshedMinutes) + 15 < minutes || Number(lastUpdated[0]) + 1 === hours) {
-        const currentData = await getWeatherFn(cityInfo[0], cityInfo[1]);
+
+      if (Number(time[1]) >= Number(refreshedAtMinutes) + 15 || Number(time[0]) > Number(refreshedAtHoursMinutes[0]) || Number(day) > Number(refreshedAtDayMonth[2]) || refreshedAtDayMonth[1].toLowerCase() !== month.toLowerCase()) {
+        await getWeatherFn(cityInfo[0], cityInfo[1]);
         console.log('page refreshed!');
       } else {
         console.log(`Page not refreshed, It's already updated!`);
