@@ -15,7 +15,8 @@ const App = () => {
 
   const [settingShow, setSettingShow] = useState(false);
 
-  const [unitName, setUnitName] = useState('celcius');
+  const [tempUnit, setTempUnit] = useState('celcius');
+  const [speedUnit, setSpeedUnit] = useState('km/h');
 
   const [themeColors, setThemeColors] = useState(
     {
@@ -50,10 +51,6 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    document.body.style.backgroundColor = themeColors.background;
-  }, [themeColors, unitName]);
-
   const mainStyle = {
     backgroundColor: themeColors.foreground,
     color: '#FFFFFF'
@@ -62,8 +59,6 @@ const App = () => {
   const linkActiveStyle = {
     backgroundColor: '#555555'
   };
-
-  // const wallpapersId = ['1746023790801-a10185075896', '1746023790104-df44921a7a88', '1758805769600-322d4f615981', '1759778276353-96f734f8df9b', '1543187018-21e461e7538e', '1476673160081-cf065607f449', '1542875272-2037d53b5e4d', '1542708993627-b6e5bbae43c4', '1542822223-606661cf0a48', '1543227043-f69c82e95af9', '1542690970-7310221dbe09'];
 
   const getLocationsFn = async (cityName) => {
     try {
@@ -184,18 +179,6 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    // check if city and its location is there in localhost.
-    if (JSON.parse(localStorage.getItem('cityInfo'))) {
-      const cityInfo = JSON.parse(localStorage.getItem('cityInfo'));
-      setCurrentCity(cityInfo[2]);
-      getWeatherFn(cityInfo[0], cityInfo[1]);
-    }
-    if (JSON.parse(localStorage.getItem('selectedTheme'))) {
-      setThemeColors(JSON.parse(localStorage.getItem('selectedTheme')));
-    }
-  }, []);
-
   const refeshPageFn = async () => {
     if (refreshTime) {
       // This is the output of refreshTime = 'Tue Oct 14, 7:00PM';
@@ -237,6 +220,42 @@ const App = () => {
     localStorage.setItem('selectedTheme', JSON.stringify(theme));
   };
 
+  const tempUnitFn = (unit) => {
+    if (unit === 'celcius' && tempUnit !== 'celcius') setTempUnit('celcius');
+    else if (unit === 'fahrenheit' && tempUnit !== 'fahrenheit') setTempUnit('fahrenheit');
+    else setTempUnit('kelvin');
+    localStorage.setItem('tempUnit', JSON.stringify(unit));
+  };
+
+  const speedUnitFn = (unit) => {
+    if (unit === 'mph' && speedUnit !== 'mph') setSpeedUnit('mph');
+    else if (unit === 'm/s' && speedUnit !== 'k/m') setSpeedUnit('m/s');
+    else setSpeedUnit('km/s');
+    localStorage.setItem('speedUnit', JSON.stringify(unit));
+  };
+
+  // Runs after every settings input click/selection;
+  useEffect(() => {
+    document.body.style.backgroundColor = themeColors.background;
+  }, [themeColors, tempUnit, speedUnit]);
+
+  // Runs only after browser reloads.
+  useEffect(() => {
+    // check if city and its location is there in localhost.
+    // It loads previous selected City.
+    if (JSON.parse(localStorage.getItem('cityInfo'))) {
+      const cityInfo = JSON.parse(localStorage.getItem('cityInfo'));
+      setCurrentCity(cityInfo[2]);
+      getWeatherFn(cityInfo[0], cityInfo[1]);
+    }
+    // It loads previous selected Theme color.
+    if (JSON.parse(localStorage.getItem('selectedTheme'))) setThemeColors(JSON.parse(localStorage.getItem('selectedTheme')));
+    // It loads previous selected Tempreature Unit.
+    if (JSON.parse(localStorage.getItem('tempUnit'))) setTempUnit(JSON.parse(localStorage.getItem('tempUnit')));
+    // It loads previous selected Speed Unit.
+    if (JSON.parse(localStorage.getItem('speedUnit'))) setSpeedUnit(JSON.parse(localStorage.getItem('speedUnit')));
+  }, []);
+
   return (
     <main style={mainStyle}>
       <section className='main_left_section'>
@@ -254,6 +273,7 @@ const App = () => {
                   <input type="text" id="cityName" value={cityName} onChange={(e) => setCityName(e.target.value)} />
                   <button type="submit">Search </button>
                 </form>
+                <p className='search_keyword_suggestions_p'>e.g. Kolkata, Tokyo, Singapore</p>
                 {menuShow ? (
                   <div className="city_menu_container">
                     <ul>
@@ -270,13 +290,18 @@ const App = () => {
               <section className='color_section'>
                 <ul>{
                   Object.entries(colorPairs).map(([key, value]) => {
-                    return <li onClick={() => themeFn(value)} key={key} style={{ backgroundColor: value.foreground }} ></li>
+                    return <li onClick={() => themeFn(value)} key={key} style={themeColors.foreground === value.foreground ? { backgroundColor: value.foreground, border: '3px solid #e8e8e8' } : { backgroundColor: value.foreground }} ></li>
                   })}
                 </ul>
               </section>
               <section className='temp_unit_section'>
-                <button style={unitName === 'celcius' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => unitName !== 'celcius' && setUnitName('celcius')}>°C</button>
-                <button style={unitName === 'fahrenheit' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => unitName !== 'fahrenheit' && setUnitName('fahrenheit')}>°F</button>
+                <button style={tempUnit === 'celcius' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => tempUnitFn('celcius')}>°C</button>
+                <button style={tempUnit === 'fahrenheit' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => tempUnitFn('fahrenheit')}>°F</button>
+              </section>
+              <section className='speed_unit_section'>
+                <button style={speedUnit === 'mph' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => speedUnitFn('mph')}>mph</button>
+                <button style={speedUnit === 'km/h' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => speedUnitFn('km/h')}>km/h</button>
+                <button style={speedUnit === 'm/s' ? { backgroundColor: '#555555' } : { backgroundColor: '#333333' }} onClick={() => speedUnitFn('m/s')}>m/s</button>
               </section>
             </section>
           ) : (<></>)
@@ -291,18 +316,17 @@ const App = () => {
           </div>
           <div>
             <p className='temp'>{weatherData && (
-              unitName === 'celcius' ? `${(weatherData.current.temperature_2m * 1).toFixed(1)}°C` :
-                unitName === 'fahrenheit' ? `${(weatherData.current.temperature_2m * 1.8 + 32).toFixed(1)}°F` : null)}
+              tempUnit === 'celcius' ? `${(weatherData.current.temperature_2m * 1).toFixed(1)}°C` :
+                tempUnit === 'fahrenheit' ? `${(weatherData.current.temperature_2m * 1.8 + 32).toFixed(1)}°F` : null)}
             </p>
             <p className='feels_like'>Feels Like: {weatherData ? (weatherData.current.apparent_temperature) : 'na'}&deg;</p>
             <p className='refresh_time'>{weatherData ? (refreshTime) : 'na'}</p>
           </div>
         </section>
-
         <section className="weather_details_container">
           <div className=''>
-            <p>Max {weatherData && (unitName === 'celcius' ? `${weatherData.daily.temperature_2m_max[0]}°C` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_max[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
-            <p>Min {weatherData && (unitName === 'celcius' ? `${weatherData.daily.temperature_2m_min[0]}°C` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_min[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
+            <p>Max {weatherData && (tempUnit === 'celcius' ? `${weatherData.daily.temperature_2m_max[0]}°C` : tempUnit === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_max[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
+            <p>Min {weatherData && (tempUnit === 'celcius' ? `${weatherData.daily.temperature_2m_min[0]}°C` : tempUnit === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_min[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
           </div>
           <div className=''>
             <p>Humidity</p>
@@ -310,7 +334,7 @@ const App = () => {
           </div>
           <div className=''>
             <p>Wind</p>
-            <p>{weatherData ? (weatherData.current.wind_speed_10m) : 'na'}km/h</p>
+            <p>{weatherData && (speedUnit === 'mph' ? `${(Number(weatherData.current.wind_speed_10m) / 1.60934).toFixed(1)}mph` : speedUnit === 'm/s' ? `${(Number(weatherData.current.wind_speed_10m) * 5 / 18).toFixed(1)}m/s` : `${weatherData.current.wind_speed_10m}km/h`)}</p>
           </div>
         </section>
         <section className='PM_section'>
@@ -332,8 +356,8 @@ const App = () => {
           </div>
           <div className=''>
             <p>Day</p>
-            <p>Min {unitName === 'celcius' ? `°C` : unitName === 'fahrenheit' ? `°F` : null} </p>
-            <p>Max {unitName === 'celcius' ? `°C` : unitName === 'fahrenheit' ? `°F` : null} </p>
+            <p>Min {tempUnit === 'celcius' ? `°C` : tempUnit === 'fahrenheit' ? `°F` : null} </p>
+            <p>Max {tempUnit === 'celcius' ? `°C` : tempUnit === 'fahrenheit' ? `°F` : null} </p>
             <p>Rain mm</p>
           </div>
           <ul>
@@ -344,8 +368,8 @@ const App = () => {
                   return (
                     <li className='' key={index}>
                       <p>{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
-                      <p>{unitName === 'celcius' ? `${weatherData.daily.temperature_2m_min[index]}°` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_min[index] * 1.8 + 32).toFixed(1)}°` : null}</p>
-                      <p>{unitName === 'celcius' ? `${weatherData.daily.temperature_2m_max[index]}°` : unitName === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_max[index] * 1.8 + 32).toFixed(1)}°` : null}</p>
+                      <p>{tempUnit === 'celcius' ? `${weatherData.daily.temperature_2m_min[index]}°` : tempUnit === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_min[index] * 1.8 + 32).toFixed(1)}°` : null}</p>
+                      <p>{tempUnit === 'celcius' ? `${weatherData.daily.temperature_2m_max[index]}°` : tempUnit === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_max[index] * 1.8 + 32).toFixed(1)}°` : null}</p>
                       <p>{weatherData.daily.rain_sum[index]}</p>
                     </li>
                   )
