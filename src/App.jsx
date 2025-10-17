@@ -20,6 +20,10 @@ const App = () => {
 
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  const [settingSpin, setSettingSpin] = useState(false);
+
+  const [refreshSpin, setRefreshSpin] = useState(false);
+
   const [themeColors, setThemeColors] = useState(
     {
       'background': '#bbebec',
@@ -204,6 +208,8 @@ const App = () => {
 
       if (Number(time[1]) >= Number(refreshedAtMinutes) + 15 || Number(time[0]) > Number(refreshedAtHoursMinutes[0]) || Number(day) > Number(refreshedAtDayMonth[2]) || refreshedAtDayMonth[1].toLowerCase() !== month.toLowerCase()) {
         await getWeatherFn(cityInfo[0], cityInfo[1]);
+        setRefreshSpin(true);
+        setTimeout(() => setRefreshSpin(false), 1000);
         console.log('page refreshed!');
       } else {
         console.log(`Page not refreshed, It's already updated!`);
@@ -215,6 +221,8 @@ const App = () => {
 
   const settingMenuFn = () => {
     setSettingShow(!settingShow);
+    setSettingSpin(true);
+    setTimeout(() => setSettingSpin(false), 1000);
   };
 
   const themeFn = (theme) => {
@@ -316,8 +324,8 @@ const App = () => {
         <header>
           <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
           <h2>Only Weather</h2>
-          <button onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
-          <button onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
+          <button className={settingSpin && 'spin'} onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
+          <button className={refreshSpin && 'spin'} onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
         </header>
         {
           settingShow ? (
