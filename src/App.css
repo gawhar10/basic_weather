@@ -103,6 +103,11 @@ form>button {
   height: 3rem;
 }
 
+.color_section ul li:disabled {
+  opacity: 0;
+  cursor: not-allowed;
+}
+
 .temp_unit_section button,
 .speed_unit_section button {
   border-style: unset;
@@ -160,7 +165,7 @@ form>button {
 .icon_temp_section div .temp {
   font-size: 5rem;
   font-weight: 600;
-  opacity: .9;
+  /* opacity: .9; */
   /* border: 1px solid teal; */
 }
 
@@ -278,5 +283,53 @@ footer p a:hover {
 
   .seven_day_weather_p {
     padding-block-end: 1rem;
+  }
+}
+
+
+
+/* Wave overlay */
+.wave-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  animation: slideWaveDown 1s ease forwards;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.wave-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Optional: Slight offset for depth */
+.layer1 {
+  animation-delay: 0s;
+}
+
+.layer2 {
+  animation-delay: 0.05s;
+}
+
+.layer3 {
+  animation-delay: 0.1s;
+}
+
+
+/* Animation */
+@keyframes slideWaveDown {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0%);
   }
 }

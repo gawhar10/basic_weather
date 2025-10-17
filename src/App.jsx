@@ -18,6 +18,8 @@ const App = () => {
   const [tempUnit, setTempUnit] = useState('celcius');
   const [speedUnit, setSpeedUnit] = useState('km/h');
 
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   const [themeColors, setThemeColors] = useState(
     {
       'background': '#bbebec',
@@ -216,8 +218,14 @@ const App = () => {
   };
 
   const themeFn = (theme) => {
+    if (isTransitioning) return; // Prevent multiple clicks during transition.
     setThemeColors(theme);
     localStorage.setItem('selectedTheme', JSON.stringify(theme));
+    setIsTransitioning(true);
+  };
+
+  const animationEndFn = () => {
+    setIsTransitioning(false);
   };
 
   const tempUnitFn = (unit) => {
@@ -258,6 +266,52 @@ const App = () => {
 
   return (
     <main style={mainStyle}>
+
+      {isTransitioning && (
+        <div className="wave-container" onAnimationEnd={animationEndFn}>
+          <svg
+            className="wave-svg layer1"
+            viewBox="0 0 1440 320"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ backgroundColor: themeColors.foreground }}
+          >
+            <path
+              fill={themeColors.background}
+              d="M0,192 C360,280 1080,100 1440,192 L1440,320 L0,320 Z"
+            />
+          </svg>
+
+          <svg
+            className="wave-svg layer2"
+            viewBox="0 0 1440 320"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ backgroundColor: themeColors.background }}
+          >
+            <path
+              fill={themeColors.foreground}
+              fillOpacity=".9"
+              d="M0,160 C480,220 960,120 1440,160 L1440,320 L0,320 Z"
+            />
+          </svg>
+
+          <svg
+            className="wave-svg layer3"
+            viewBox="0 0 1440 320"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ backgroundColor: themeColors.foreground }}
+          >
+            <path
+              fill={themeColors.background}
+              fillOpacity=".8"
+              d="M0,128 C600,200 840,40 1440,128 L1440,320 L0,320 Z"
+            />
+          </svg>
+        </div>
+      )}
+
       <section className='main_left_section'>
         <header>
           <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
@@ -290,7 +344,7 @@ const App = () => {
               <section className='color_section'>
                 <ul>{
                   Object.entries(colorPairs).map(([key, value]) => {
-                    return <li onClick={() => themeFn(value)} key={key} style={themeColors.foreground === value.foreground ? { backgroundColor: value.foreground, border: '3px solid #e8e8e8' } : { backgroundColor: value.foreground }} ></li>
+                    return <li onClick={() => themeFn(value)} disabled={isTransitioning} key={key} style={themeColors.foreground === value.foreground ? { backgroundColor: value.foreground, border: '3px solid #e8e8e8' } : { backgroundColor: value.foreground }} ></li>
                   })}
                 </ul>
               </section>
