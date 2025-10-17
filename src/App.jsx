@@ -88,13 +88,12 @@ const App = () => {
   };
 
   const makeRegularTimeFn = (ISOTime) => {
-    const newDate = new Date(ISOTime);
-    const date = newDate.toDateString().split(' ');
-    date.pop();
-    const time = newDate.toLocaleTimeString().split(':');
-    const amPm = time[2].split(' ')[1].toUpperCase();
-    time.pop();
-    return `${date.join(' ')}, ${time.join(':')}${amPm}`;
+    const date = new Date(ISOTime);
+    const options = {
+      month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    };
+    return date.toLocaleString('en-US', options);
   };
 
   const getAQIFn = async (latitude, longitude, ISOTime) => {
@@ -324,8 +323,8 @@ const App = () => {
         <header>
           <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
           <h2>Only Weather</h2>
-          <button className={settingSpin && 'spin'} onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
-          <button className={refreshSpin && 'spin'} onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
+          <button className={settingSpin ? 'spin' : ''} onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
+          <button className={refreshSpin ? 'spin' : ''} onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
         </header>
         {
           settingShow ? (
