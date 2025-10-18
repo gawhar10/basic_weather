@@ -19,8 +19,9 @@ const App = () => {
   const [speedUnit, setSpeedUnit] = useState('km/h');
 
   const [isTransitioning, setIsTransitioning] = useState(false);
-
   const [settingSpin, setSettingSpin] = useState(false);
+
+  const [isPageHidden, setIsPageHidden] = useState(true);
 
   const [refreshSpin, setRefreshSpin] = useState(false);
 
@@ -89,11 +90,16 @@ const App = () => {
 
   const makeRegularTimeFn = (ISOTime) => {
     const date = new Date(ISOTime);
-    const options = {
-      month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    };
-    return date.toLocaleString('en-US', options);
+    // const options = {
+    //   month: 'short', day: 'numeric',
+    //   hour: '2-digit', minute: '2-digit'
+    // };
+    // return date.toLocaleString('en-US', options);
+    const time = date.toLocaleTimeString('en-US').split(':');
+    const AMPMString = time.pop().split(' ').pop();
+    const localDate = date.toDateString().split(' ');
+    localDate.pop();
+    return `${localDate.join(' ')},${time.join(':')}${AMPMString}`;
   };
 
   const getAQIFn = async (latitude, longitude, ISOTime) => {
@@ -159,6 +165,7 @@ const App = () => {
       setWmoWeather(() => WMOWeatherCodeFn(response.current.weather_code));
       setRefreshTime(() => makeRegularTimeFn(response.current.time));
       getAQIFn(latitude, longitude, response.current.time);
+      setIsPageHidden(false);
       // console.log(response);
     } catch (error) {
       console.log('error: ', error);
@@ -186,7 +193,7 @@ const App = () => {
 
   const refeshPageFn = async () => {
     if (refreshTime) {
-      // This is the output of refreshTime = 'Tue Oct 14, 7:00PM';
+      // Contents of refreshTime = 'Tue Oct 14,7:00PM';
       const refreshedAt = refreshTime.split(',');
       const refreshedAtDayMonth = refreshedAt[0].split(' ');
       const refreshedAtHoursMinutes = refreshedAt[1].split(':');
@@ -210,12 +217,10 @@ const App = () => {
         setRefreshSpin(true);
         setTimeout(() => setRefreshSpin(false), 1000);
         console.log('page refreshed!');
-      } else {
-        console.log(`Page not refreshed, It's already updated!`);
-      }
-    } else {
-      console.log(`Page not refreshed!`);
-    }
+      } else console.log(`Page not refreshed, It's already updated!`);
+
+    } else console.log(`Page not refreshed!`);
+
   };
 
   const settingMenuFn = () => {
@@ -256,6 +261,10 @@ const App = () => {
 
   // Runs only after browser reloads.
   useEffect(() => {
+    // For first time use enable setting page.
+    if (!weatherData) {
+      setSettingShow(true);
+    }
     // check if city and its location is there in localhost.
     // It loads previous selected City.
     if (JSON.parse(localStorage.getItem('cityInfo'))) {
@@ -272,7 +281,7 @@ const App = () => {
   }, []);
 
   return (
-    <main style={mainStyle}>
+    <main style={isPageHidden ? { maxWidth: '400px', gridTemplateColumns: '1fr', backgroundColor: themeColors.foreground, color: 'white' } : { maxWidth: '800px', gridTemplateColumns: '1fr 1fr', backgroundColor: themeColors.foreground, color: 'white' }}>
 
       {isTransitioning && (
         <div className="wave-container" onAnimationEnd={animationEndFn}>
@@ -322,7 +331,7 @@ const App = () => {
       <section className='main_left_section'>
         <header>
           <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
-          <h2>Only Weather</h2>
+          <h2>Basic Weather</h2>
           <button className={settingSpin ? 'spin' : ''} onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
           <button className={refreshSpin ? 'spin' : ''} onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
         </header>
@@ -367,50 +376,50 @@ const App = () => {
             </section>
           ) : (<></>)
         }
-        <section className="city_name_section">
+        {isPageHidden ? null : (<section className="city_name_section">
           <p>{currentCity}</p>
-        </section>
-        <section className="icon_temp_section">
+        </section>)}
+        {isPageHidden ? null : (<section className="icon_temp_section">
           <div>
             <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="icon"></img>
-            <p className='weather_code'>{wmoWeather ? wmoWeather : 'na'}</p>
+            <p className='weather_code'>{wmoWeather ? wmoWeather : null}</p>
           </div>
           <div>
             <p className='temp'>{weatherData && (
               tempUnit === 'celcius' ? `${(weatherData.current.temperature_2m * 1).toFixed(1)}°C` :
                 tempUnit === 'fahrenheit' ? `${(weatherData.current.temperature_2m * 1.8 + 32).toFixed(1)}°F` : null)}
             </p>
-            <p className='feels_like'>Feels Like: {weatherData ? (weatherData.current.apparent_temperature) : 'na'}&deg;</p>
-            <p className='refresh_time'>{weatherData ? (refreshTime) : 'na'}</p>
+            <p className='feels_like'>{weatherData ? `Feels Like: ${weatherData.current.apparent_temperature}°` : null}</p>
+            <p className='refresh_time'>{weatherData ? (refreshTime) : null}</p>
           </div>
-        </section>
-        <section className="weather_details_container">
+        </section>)}
+        {isPageHidden ? null : (<section className="weather_details_container">
           <div className=''>
             <p>Max {weatherData && (tempUnit === 'celcius' ? `${weatherData.daily.temperature_2m_max[0]}°C` : tempUnit === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_max[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
             <p>Min {weatherData && (tempUnit === 'celcius' ? `${weatherData.daily.temperature_2m_min[0]}°C` : tempUnit === 'fahrenheit' ? `${(weatherData.daily.temperature_2m_min[0] * 1.8 + 32).toFixed(1)}°F` : null)}</p>
           </div>
           <div className=''>
             <p>Humidity</p>
-            <p>{weatherData ? (weatherData.current.relative_humidity_2m) : 'na'}%</p>
+            <p>{weatherData ? (weatherData.current.relative_humidity_2m) : null}%</p>
           </div>
           <div className=''>
             <p>Wind</p>
             <p>{weatherData && (speedUnit === 'mph' ? `${(Number(weatherData.current.wind_speed_10m) / 1.60934).toFixed(1)}mph` : speedUnit === 'm/s' ? `${(Number(weatherData.current.wind_speed_10m) * 5 / 18).toFixed(1)}m/s` : `${weatherData.current.wind_speed_10m}km/h`)}</p>
           </div>
-        </section>
-        <section className='PM_section'>
+        </section>)}
+        {isPageHidden ? null : (<section className='PM_section'>
           <div>
             <p>PM2.5</p>
-            <p>{currentCity ? (PM2_5Current) : 'na'} μg/m³</p>
+            <p>{currentCity ? (PM2_5Current) : null} μg/m³</p>
           </div>
           <div>
             <p>PM10</p>
-            <p>{currentCity ? (PM10Current) : 'na'} μg/m³</p>
+            <p>{currentCity ? (PM10Current) : null} μg/m³</p>
           </div>
-        </section>
+        </section>)}
       </section>
 
-      <section className='main_right_section'>
+      {isPageHidden ? null : (<section className='main_right_section'>
         <section className='sevenDay_container'>
           <div className='seven_day_weather_p'>
             <p>Seven days Weather</p>
@@ -443,7 +452,7 @@ const App = () => {
           <p>This app made possible by <a href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer'>open-meteo.com</a>.</p>
           <p>&copy; Designed and Coded by <a href='https://github.com/gawhar10/' target='_blank' rel='noopener noreferrer'>Gawhar10.</a></p>
         </footer>
-      </section>
+      </section>)}
 
     </main>
   )

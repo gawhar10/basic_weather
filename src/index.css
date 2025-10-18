@@ -2,7 +2,9 @@ html {
     font-size: 62.5%;
 }
 
-* {
+*,
+::before,
+::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -10,20 +12,9 @@ html {
 
 :root {
     --font-family: "Oswald", sans-serif;
-    --baby-blue: rgb(231, 246, 252);
-    --teal-green: rgb(2, 132, 118);
-    --forest-green: rgb(0, 34, 28);
-    --teal-blue: rgb(165, 207, 227);
-    --white: rgb(255, 255, 255);
-    --box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
-    --border-radius: 0.4rem;
-    --mint-tint: rgba(0, 199, 190, 0.2);
-    --mint-tint-hover: rgba(0, 199, 190, 0.35);
     --font-size: 1.6rem;
 }
 
 body {
     font-family: var(--font-family);
-    margin: 0;
-    height: 100vh;
 }
