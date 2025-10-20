@@ -249,8 +249,8 @@ const App = () => {
 
   const speedUnitFn = (unit) => {
     if (unit === 'mph' && speedUnit !== 'mph') setSpeedUnit('mph');
-    else if (unit === 'm/s' && speedUnit !== 'k/m') setSpeedUnit('m/s');
-    else setSpeedUnit('km/s');
+    else if (unit === 'm/s' && speedUnit !== 'm/s') setSpeedUnit('m/s');
+    else setSpeedUnit('km/h');
     localStorage.setItem('speedUnit', JSON.stringify(unit));
   };
 
