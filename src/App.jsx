@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 const App = () => {
   const [weatherData, setWeatherData] = useState(false);
-  const [currentCity, setCurrentCity] = useState("");
+  const [currentCity, setCurrentCity] = useState([]);
   const [refreshTime, setRefreshTime] = useState("");
   const [wmoWeather, setWmoWeather] = useState("");
   const [PM10Current, setPM10Current] = useState("");
@@ -172,11 +172,11 @@ const App = () => {
     }
   };
 
-  const citySelectHandler = (latitude, longitude, city) => {
+  const citySelectHandler = (latitude, longitude, city, country) => {
     setMenuShow(false);
-    setCurrentCity(city);
+    setCurrentCity([city, country]);
     // console.log(`latitude: ${latitude}, longitude: ${longitude}`);
-    const cityInfo = [latitude, longitude, city];
+    const cityInfo = [latitude, longitude, city, country];
     localStorage.setItem('cityInfo', JSON.stringify(cityInfo));
     getWeatherFn(latitude, longitude);
   };
@@ -262,14 +262,14 @@ const App = () => {
   // Runs only after browser reloads.
   useEffect(() => {
     // For first time use enable setting page.
-    if (!weatherData) {
+    if (!JSON.parse(localStorage.getItem('cityInfo'))) {
       setSettingShow(true);
     }
     // check if city and its location is there in localhost.
     // It loads previous selected City.
     if (JSON.parse(localStorage.getItem('cityInfo'))) {
       const cityInfo = JSON.parse(localStorage.getItem('cityInfo'));
-      setCurrentCity(cityInfo[2]);
+      setCurrentCity([cityInfo[2], cityInfo[3]]);
       getWeatherFn(cityInfo[0], cityInfo[1]);
     }
     // It loads previous selected Theme color.
@@ -281,7 +281,7 @@ const App = () => {
   }, []);
 
   return (
-    <main style={isPageHidden ? { maxWidth: '400px', gridTemplateColumns: '1fr', backgroundColor: themeColors.foreground, color: 'white' } : { maxWidth: '800px', gridTemplateColumns: '1fr 1fr', backgroundColor: themeColors.foreground, color: 'white' }}>
+    <main className={isPageHidden ? 'main_0' : 'main_1'} style={{ backgroundColor: themeColors.foreground, color: 'white' }}>
 
       {isTransitioning && (
         <div className="wave-container" onAnimationEnd={animationEndFn}>
@@ -330,10 +330,14 @@ const App = () => {
 
       <section className='main_left_section'>
         <header>
-          <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
-          <h2>Basic Weather</h2>
-          <button className={settingSpin ? 'spin' : ''} onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
-          <button className={refreshSpin ? 'spin' : ''} onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
+          <div>
+            <img src={`/images/${wmoWeather.toLowerCase()}.svg`} alt="logo" />
+            <h2>Basic Weather</h2>
+          </div>
+          <div>
+            <button className={settingSpin ? 'spin' : ''} onClick={settingMenuFn}><img src="./images/settings.svg" alt="setting button" /></button>
+            <button className={refreshSpin ? 'spin' : ''} onClick={refeshPageFn}><img src="./images/refresh.svg" alt="refresh button" /></button>
+          </div>
         </header>
         {
           settingShow ? (
@@ -350,7 +354,7 @@ const App = () => {
                       {cityList.map((city) => {
                         const { admin1, country, id, latitude, longitude, name, } = city;
                         return (
-                          <li key={id}><a onClick={() => citySelectHandler(latitude, longitude, name)}>{name}, {admin1}, {country}</a></li>
+                          <li key={id}><a onClick={() => citySelectHandler(latitude, longitude, name, country)}>{name}, {admin1}, {country}</a></li>
                         );
                       })}
                     </ul>
@@ -377,7 +381,7 @@ const App = () => {
           ) : (<></>)
         }
         {isPageHidden ? null : (<section className="city_name_section">
-          <p>{currentCity}</p>
+          <p>{`${currentCity[0]}, ${currentCity[1]}`}</p>
         </section>)}
         {isPageHidden ? null : (<section className="icon_temp_section">
           <div>
@@ -407,14 +411,19 @@ const App = () => {
             <p>{weatherData && (speedUnit === 'mph' ? `${(Number(weatherData.current.wind_speed_10m) / 1.60934).toFixed(1)}mph` : speedUnit === 'm/s' ? `${(Number(weatherData.current.wind_speed_10m) * 5 / 18).toFixed(1)}m/s` : `${weatherData.current.wind_speed_10m}km/h`)}</p>
           </div>
         </section>)}
-        {isPageHidden ? null : (<section className='PM_section'>
+        {isPageHidden ? null : (<section className='AQI_section'>
           <div>
-            <p>PM2.5</p>
-            <p>{currentCity ? (PM2_5Current) : null} μg/m³</p>
+            <p>Air Quality Index</p>
           </div>
           <div>
-            <p>PM10</p>
-            <p>{currentCity ? (PM10Current) : null} μg/m³</p>
+            <div>
+              <p>PM2.5</p>
+              <p>{currentCity ? (PM2_5Current) : null} μg/m³</p>
+            </div>
+            <div>
+              <p>PM10</p>
+              <p>{currentCity ? (PM10Current) : null} μg/m³</p>
+            </div>
           </div>
         </section>)}
       </section>
